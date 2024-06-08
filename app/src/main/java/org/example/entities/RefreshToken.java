@@ -16,7 +16,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@Table(name = "tokens")
+@Table(name = "refresh_token")
 public class RefreshToken {
 
     @Id
