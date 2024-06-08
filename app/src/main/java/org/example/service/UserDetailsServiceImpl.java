@@ -1,5 +1,7 @@
 package org.example.service;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.example.entities.UserInfo;
 import org.example.models.UserInfoDto;
 import org.example.repository.UserRepository;
@@ -8,10 +10,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
 
+@Component
+@AllArgsConstructor
+@Data
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
@@ -34,13 +41,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public String signupUser(UserInfoDto userInfoDto){
-        if(Objects.nonNull(checkIfUserAlreadyExist(userInfoDto)))
-            throw new RuntimeException("user already exist");
-
         //create new user
-        userInfoDto.setUserId(UUID.randomUUID().toString());
-        userInfoDto.setPassword(passwordEncoder.encode(userInfoDto.getPassword()));
-        userRepository.save(userInfoDto);
+        UserInfo checkExist = checkIfUserAlreadyExist(userInfoDto);
+        if(checkExist == null )
+        {
+            userInfoDto.setPassword(passwordEncoder.encode(userInfoDto.getPassword()));
+            userInfoDto.setUserId(UUID.randomUUID().toString());
+            userRepository.save(new UserInfo(userInfoDto.getUserId(), userInfoDto.getUsername(), userInfoDto.getPassword(), new HashSet<>()));
+        }
 
         return userInfoDto.getUserId();
     }
